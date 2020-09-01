@@ -9,7 +9,7 @@ description: |-
 
 # bitbucket\_deployment
 
-This resource allows you to setup pipelines environments.
+This resource allows you to setup pipelines deployment environments.
 
 # Example Usage
 
@@ -19,7 +19,6 @@ resource "bitbucket_repository" "monorepo" {
     name = "illusions"
     pipelines_enabled = true
 }
-
 resource "bitbucket_deployment" "test" {
   repository = bitbucket_repository.monorepo.id
   name = "test"
@@ -29,7 +28,7 @@ resource "bitbucket_deployment" "test" {
 
 # Argument Reference
 
-* `name` - (Required) The name of the environment
+* `name` - (Required) The name of the deployment environment
 * `stage` - (Required) The stage (Test, Staging, Production)
-* `repository` - (Required) The repository ID you want to put this variable onto.
-* `uuid` - (Computed) The UUID of the environment
+* `repository` - (Required) The repository ID to which you want to assign this deployment environment to
+* `uuid` - (Computed) The UUID of the deployment environment
