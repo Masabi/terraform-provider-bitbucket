@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform/helper/schema"
 	"io/ioutil"
 	"log"
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // DeploymentVariable structure for handling key info
@@ -107,7 +106,7 @@ func resourceDeploymentVariableCreate(d *schema.ResourceData, m interface{}) err
 		return decodeerr
 	}
 	d.Set("uuid", rv.UUID)
-	d.SetId(rv.Key)
+	d.SetId(rv.UUID)
 
 	time.Sleep(5000 * time.Millisecond) // sleep for a while, to allow BitBucket cache to catch up
 	return resourceDeploymentVariableRead(d, m)
@@ -144,6 +143,7 @@ func resourceDeploymentVariableRead(d *schema.ResourceData, m interface{}) error
 		var uuid = d.Get("uuid").(string)
 		for _, rv := range prv.Values {
 			if rv.UUID == uuid {
+				d.SetId(rv.UUID)
 				d.Set("key", rv.Key)
 				d.Set("value", rv.Value)
 				d.Set("secured", rv.Secured)

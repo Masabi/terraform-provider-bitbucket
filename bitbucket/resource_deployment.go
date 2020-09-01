@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"io/ioutil"
 	"log"
 	"net/url"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // Deployment structure for handling key info
@@ -104,16 +103,16 @@ func resourceDeploymentCreate(d *schema.ResourceData, m interface{}) error {
 func resourceDeploymentRead(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*Client)
-	rvReq, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/environments/%s",
+	req, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/environments/%s",
 		d.Get("repository").(string),
 		d.Get("uuid").(string),
 	))
 
 	log.Printf("ID: %s", url.PathEscape(d.Id()))
 
-	if rvReq.StatusCode == 200 {
+	if req.StatusCode == 200 {
 		var Deployment Deployment
-		body, readerr := ioutil.ReadAll(rvReq.Body)
+		body, readerr := ioutil.ReadAll(req.Body)
 		if readerr != nil {
 			return readerr
 		}
@@ -128,7 +127,7 @@ func resourceDeploymentRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("stage", Deployment.Stage.Name)
 	}
 
-	if rvReq.StatusCode == 404 {
+	if req.StatusCode == 404 {
 		d.SetId("")
 		return nil
 	}
@@ -162,9 +161,9 @@ func resourceDeploymentUpdate(d *schema.ResourceData, m interface{}) error {
 
 func resourceDeploymentDelete(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	_, err := client.Delete(fmt.Sprintf(fmt.Sprintf("2.0/repositories/%s/environments/%s",
+	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/environments/%s",
 		d.Get("repository").(string),
 		d.Get("uuid").(string),
-	)))
+	))
 	return err
 }
